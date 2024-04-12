@@ -1,5 +1,12 @@
 Change Log
 
+## [0.2.1](https://github.com/deepgram-devs/deepgram-conversational-demo/compare/0.2.0...0.2.1) (2024-04-12)
+
+
+### Bug Fixes
+
+* fix failsafe repeats ([5f9b25b](https://github.com/deepgram-devs/deepgram-conversational-demo/commit/5f9b25b25cf73f184cd1e7396cf6769a16760d66))
+
 # [0.2.0](https://github.com/deepgram-devs/deepgram-conversational-demo/compare/0.1.0...0.2.0) (2024-04-12)
 
 
