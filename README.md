@@ -58,11 +58,13 @@ Copy the code from `sample.env.local` and create a new file called `.env.local`.
 DEEPGRAM_STT_DOMAIN=https://api.deepgram.com
 DEEPGRAM_API_KEY=YOUR-DG-API-KEY
 OPENAI_API_KEY=YOUR-OPENAI-API-KEY
+NEXT_PUBLIC_SIMLI_API_KEY=YOUR-SIMLI-API-KEY
 ```
 
 1. For `DEEPGRAM_API_KEY` paste in the key you generated in the [Deepgram console](https://console.deepgram.com/).
 2. Set `DEEPGRAM_STT_DOMAIN` to be `https://api.deepgram.com`.
 3. `OPENAI_API_KEY` should be an OpenAI API Key that can access the chat completions API.
+4. `SIMLI-API-KEY` get your simli key from [Simli](https://www.simli.com/)
 
 #### Run the application
 
