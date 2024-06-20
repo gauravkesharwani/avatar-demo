@@ -11,7 +11,7 @@ import { NextUIProvider } from "@nextui-org/react";
 import { useMicVAD } from "@ricky0123/vad-react";
 import { useNowPlaying } from "react-nowplaying";
 import { useQueue } from "@uidotdev/usehooks";
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
 import { ChatBubble } from "./ChatBubble";
 import {
@@ -29,6 +29,13 @@ import { useMessageData } from "../context/MessageMetadata";
 import { useMicrophone } from "../context/Microphone";
 import { useAudioStore } from "../context/AudioStore";
 
+import SimliFaceStream from "./SimliFaceStream/SimliFaceStream";
+import { StartAudioToVideoSession } from "./SimliFaceStream/startAudioToVideoSession";
+
+interface SimliFaceStreamRef {
+  sendAudioDataToLipsync: (pcm16Array: Uint8Array) => void;
+}
+
 /**
  * Conversation element that contains the conversational AI app.
  * @returns {JSX.Element}
@@ -37,6 +44,10 @@ export default function Conversation(): JSX.Element {
   /**
    * Custom context providers
    */
+  const simliFaceStreamRef = useRef<SimliFaceStreamRef | null>(null);
+  const [faceId, setFaceId] = useState("04d062bc-00ce-4bb0-ace9-76880e3987ec");
+  const [sessionToken, setSessionToken] = useState("");
+
   const { ttsOptions, connection, connectionReady } = useDeepgram();
   const { addAudio } = useAudioStore();
   const { player, stop: stopAudio, play: startAudio } = useNowPlaying();
@@ -70,6 +81,51 @@ export default function Conversation(): JSX.Element {
   const [initialLoad, setInitialLoad] = useState(true);
   const [isProcessing, setProcessing] = useState(false);
 
+  async function convertMp3ToPcm16(mp3Blob: Blob) {
+    // Create an audio context
+    const audioContext = new (window.AudioContext ||
+      window.webkitAudioContext)();
+
+    // Decode the MP3 file to PCM format
+    const arrayBuffer = await mp3Blob.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+    // Create an offline audio context for resampling
+    const offlineContext = new OfflineAudioContext(
+      audioBuffer.numberOfChannels, // Number of channels (e.g., 2 for stereo)
+      audioBuffer.duration * 16000, // Duration in frames
+      16000 // Sample rate (16kHz)
+    );
+
+    // Create a buffer source and set its buffer to the decoded audio data
+    const source = offlineContext.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(offlineContext.destination);
+    source.start(0);
+
+    // Render the resampled audio
+    const resampledBuffer = await offlineContext.startRendering();
+
+    // Prepare to convert the PCM data to 16-bit PCM
+    const numberOfChannels = resampledBuffer.numberOfChannels;
+    const length = resampledBuffer.length * numberOfChannels * 2; // 2 bytes per sample (16-bit)
+    const pcm16Array = new Uint8Array(length);
+    const view = new DataView(pcm16Array.buffer);
+
+    // Iterate through each sample and channel to convert to 16-bit PCM
+    let offset = 0;
+    for (let i = 0; i < resampledBuffer.length; i++) {
+      for (let channel = 0; channel < numberOfChannels; channel++) {
+        const sample = resampledBuffer.getChannelData(channel)[i];
+        const clampedSample = Math.max(-1, Math.min(1, sample)); // Clamp sample between -1 and 1
+        view.setInt16(offset, clampedSample * 0x7fff, true); // true for little-endian
+        offset += 2;
+      }
+    }
+
+    return pcm16Array; // Return the 16-bit PCM data as a Uint8Array
+  }
+
   /**
    * Request audio from API
    */
@@ -87,16 +143,24 @@ export default function Conversation(): JSX.Element {
       const headers = res.headers;
 
       const blob = await res.blob();
+      console.log("Audio Blob:", blob);
 
-      startAudio(blob, "audio/mp3", message.id).then(() => {
-        addAudio({
-          id: message.id,
-          blob,
-          latency: Number(headers.get("X-DG-Latency")) ?? Date.now() - start,
-          networkLatency: Date.now() - start,
-          model,
-        });
+      convertMp3ToPcm16(blob).then((pcm16Array) => {
+        console.log("PCM16 Array:", pcm16Array);
+        if (simliFaceStreamRef.current) {
+          simliFaceStreamRef.current.sendAudioDataToLipsync(pcm16Array);
+        }
       });
+
+      // startAudio(blob, "audio/mp3", message.id).then(() => {
+      //   addAudio({
+      //     id: message.id,
+      //     blob,
+      //     latency: Number(headers.get("X-DG-Latency")) ?? Date.now() - start,
+      //     networkLatency: Date.now() - start,
+      //     model,
+      //   });
+      // });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [ttsOptions?.model]
@@ -252,24 +316,31 @@ export default function Conversation(): JSX.Element {
   const startConversation = useCallback(() => {
     if (!initialLoad) return;
 
-    setInitialLoad(false);
+    StartAudioToVideoSession(faceId, true, true).then((response) => {
+      console.log("Session Token:", response);
+      setSessionToken(response.session_token);
 
-    // add a stub message data with no latency
-    const welcomeMetadata: MessageMetadata = {
-      ...greetingMessage,
-      ttsModel: ttsOptions?.model,
-    };
+      setInitialLoad(false);
 
-    addMessageData(welcomeMetadata);
+      // add a stub message data with no latency
+      const welcomeMetadata: MessageMetadata = {
+        ...greetingMessage,
+        ttsModel: ttsOptions?.model,
+      };
 
-    // get welcome audio
-    requestWelcomeAudio();
+      addMessageData(welcomeMetadata);
+
+      // get welcome audio
+      requestWelcomeAudio();
+    });
   }, [
     addMessageData,
     greetingMessage,
     initialLoad,
     requestWelcomeAudio,
     ttsOptions?.model,
+    StartAudioToVideoSession,
+    setSessionToken,
   ]);
 
   useEffect(() => {
@@ -445,6 +516,17 @@ export default function Conversation(): JSX.Element {
           <div className="flex flex-row h-full w-full overflow-x-hidden">
             <div className="flex flex-col flex-auto h-full">
               <div className="flex flex-col justify-between h-full">
+                {!initialLoad && (
+                  <div className="w-full h-[256px] flex justify-center items-center scale-50">
+                    <SimliFaceStream
+                      ref={simliFaceStreamRef}
+                      start={true}
+                      sessionToken={sessionToken}
+                      minimumChunkSize={8}
+                    />
+                    {/* <div className=" h-[512px] w-[512px] bg-white"></div> */}
+                  </div>
+                )}
                 <div
                   className={`flex flex-col h-full overflow-hidden ${
                     initialLoad ? "justify-center" : "justify-end"
@@ -452,7 +534,10 @@ export default function Conversation(): JSX.Element {
                 >
                   <div className="grid grid-cols-12 overflow-x-auto gap-y-2">
                     {initialLoad ? (
-                      <InitialLoad fn={startConversation} connecting={!connection} />
+                      <InitialLoad
+                        fn={startConversation}
+                        connecting={!connection}
+                      />
                     ) : (
                       <>
                         {chatMessages.length > 0 &&
