@@ -1,36 +1,13 @@
-# Deepgram AI Agent Technical Demo 
+# Simli Deepgram AI Agent Technical Demo 
 
-Combine Text-to-Speech and Speech-to-Text into a conversational agent.
-
-> Project codename EmilyAI
-
-[![Discord](https://dcbadge.vercel.app/api/server/xWRaCDBtW4?style=flat)](https://discord.gg/xWRaCDBtW4)
-
-The purpose of this demo is to showcase how you can build a Conversational AI application that engages users in natural language interactions, mimicking human conversation through natural language processing using [Deepgram](https://deepgram.com/).
-
-Examples of where you would see this type of application include: virtual assistants for tasks like answering queries and controlling smart devices, educational tutors for personalized learning, healthcare advisors for medical information, and entertainment chat bots for engaging conversations and games.
-
-These applications aim to enhance user experiences by offering efficient and intuitive interactions, reducing the need for human intervention in various tasks and services.
-
-## Issue Reporting
-
-If you have found a bug or if you have a feature request, please report them at this repository issues section. Please do not report security vulnerabilities on the public GitHub issue tracker.
-
-Check out our [KNOWN ISSUES](./KNOWN_ISSUES.md) before reporting.
+Combine Text-to-Speech, Speech-to-Text and Simli's Speech-to-Video into a conversational agent.
 
 ## Demo features
 
 - Capture streaming audio using [Deepgram Streaming Speech to Text](https://developers.deepgram.com/docs/getting-started-with-live-streaming-audio).
 - Natural Language responses using an OpenAI LLM.
-- Speech to Text conversion using [Deepgram Aura Text to Speech](https://developers.deepgram.com/docs/text-to-speech).
-
-## What is Deepgram?
-
-[Deepgram](https://deepgram.com/) is a foundational AI company providing speech-to-text and language understanding capabilities to make data readable and actionable by human or machines.
-
-## Sign-up to Deepgram
-
-Want to start building using this project? [Sign-up now for Deepgram and create an API key](https://console.deepgram.com/signup?jump=keys).
+- Text to Speech conversion using [Deepgram Aura Text to Speech](https://developers.deepgram.com/docs/text-to-speech).
+- Speech to Video avatars using [Simli LipsyncStream](https://docs.simli.com/)
 
 ## Quickstart
 
@@ -40,7 +17,7 @@ Follow these steps to get started with this starter application.
 
 #### Clone the repository
 
-Go to GitHub and [clone the repository](https://github.com/deepgram-starters/live-nextjs-starter).
+Go to GitHub and clone the repository.
 
 #### Install dependencies
 
@@ -66,21 +43,17 @@ NEXT_PUBLIC_SIMLI_API_KEY=YOUR-SIMLI-API-KEY
 3. `OPENAI_API_KEY` should be an OpenAI API Key that can access the chat completions API.
 4. `SIMLI-API-KEY` get your simli key from [Simli](https://www.simli.com/)
 
-#### Run the application
+#### Build the application
 
 Once running, you can [access the application in your browser](http://localhost:3000).
 
 ```bash
-npm run dev
+npm run build
 ```
 
-## Getting Help
-
-We love to hear from you so if you have questions, comments or find a bug in the project, let us know! You can either:
-
-- [Open an issue in this repository](https://github.com/deepgram-devs/deepgram-aura-tts-demo/issues)
-- [Join the Deepgram Github Discussions Community](https://github.com/orgs/deepgram/discussions)
-- [Join the Deepgram Discord Community](https://discord.gg/xWRaCDBtW4)
+```bash
+npm start
+```
 
 ## Author
 
