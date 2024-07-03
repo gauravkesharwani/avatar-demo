@@ -45,7 +45,7 @@ export default function Conversation(): JSX.Element {
    * Custom context providers
    */
   const simliFaceStreamRef = useRef<SimliFaceStreamRef | null>(null);
-  const [faceId, setFaceId] = useState("04d062bc-00ce-4bb0-ace9-76880e3987ec");
+  const [faceId, setFaceId] = useState("tmp9i8bbq7c");
   const [sessionToken, setSessionToken] = useState("");
 
   const { ttsOptions, connection, connectionReady } = useDeepgram();
@@ -150,6 +150,13 @@ export default function Conversation(): JSX.Element {
         if (simliFaceStreamRef.current) {
           simliFaceStreamRef.current.sendAudioData(pcm16Array);
         }
+        addAudio({
+          id: message.id,
+          blob,
+          latency: Number(headers.get("X-DG-Latency")) ?? Date.now() - start,
+          networkLatency: Date.now() - start,
+          model,
+        });
       });
 
       // startAudio(blob, "audio/mp3", message.id).then(() => {
@@ -517,14 +524,13 @@ export default function Conversation(): JSX.Element {
             <div className="flex flex-col flex-auto h-full">
               <div className="flex flex-col justify-between h-full">
                 {!initialLoad && (
-                  <div className="w-full h-[256px] flex justify-center items-center scale-50">
+                  <div className="w-full h-[256px] flex justify-center items-center scale-50 p-4">
                     <SimliFaceStream
                       ref={simliFaceStreamRef}
                       start={true}
                       sessionToken={sessionToken}
-                      minimumChunkSize={8}
+                      minimumChunkSize={12}
                     />
-                    {/* <div className=" h-[512px] w-[512px] bg-white"></div> */}
                   </div>
                 )}
                 <div

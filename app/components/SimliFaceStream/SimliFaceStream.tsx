@@ -238,6 +238,7 @@ const SimliFaceStream = forwardRef(
       // Update current frame buffer if there is a new frame
       if (currentFrameIndex.current === 0) {
         const frame: ImageFrame[] | undefined = frameQueue.current.shift();
+        if (frame === undefined) return;
         currentFrameQueue.current = frame;
       }
 
