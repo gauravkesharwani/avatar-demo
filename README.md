@@ -2,6 +2,8 @@
 
 Combine Text-to-Speech, Speech-to-Text and Simli's Speech-to-Video into a conversational agent.
 
+https://github.com/simliai/simli-deepgram-conversational-demo/assets/21877450/de752be0-954a-405b-b995-c8a5e3382d28
+
 ## Demo features
 
 - Capture streaming audio using [Deepgram Streaming Speech to Text](https://developers.deepgram.com/docs/getting-started-with-live-streaming-audio).
