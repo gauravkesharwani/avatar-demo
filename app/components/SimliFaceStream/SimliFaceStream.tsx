@@ -31,7 +31,8 @@ interface props {
 const SimliFaceStream = forwardRef(
   ({ start, sessionToken, minimumChunkSize = 6 }: props, ref) => {
     useImperativeHandle(ref, () => ({
-      sendAudioDataToLipsync,
+      sendAudioData,
+      interrupt,
     }));
     SimliFaceStream.displayName = 'SimliFaceStream';
 
@@ -39,13 +40,13 @@ const SimliFaceStream = forwardRef(
     const startTime = useRef<any>();
     const chunkCollectionTime = useRef<any>();
     const numberOfChunksInQue = useRef<number>(0); // Number of buffered chunks in queue waiting to be decoded
+    const interrupted = useRef<boolean>(false); // Interrupted flag for audio data
 
     // ------------------- AUDIO -------------------
     const audioPCMPlayer = useRef<PCMPlayer | null>(null); // Ref for audio PCM player
     const audioContext = useRef<AudioContext | null>(null); // Ref for audio context
     const audioQueue = useRef<Array<Uint8Array>>([]); // Ref for audio queue
-    const isSilent = useRef<boolean>(false);
-    const silenceTime = useRef<any>(); // Silence time for audio data
+    const audioDataQueue = useRef<Array<Uint8Array>>([]); // Ref for audio data queue
 
     // ------------------- VIDEO -------------------
     const frameQueue = useRef<Array<Array<ImageFrame>>>([]); // Queue for storing video data
@@ -59,23 +60,21 @@ const SimliFaceStream = forwardRef(
 
     useEffect(() => {
       setInterval(() => {
-        const timeDifference = performance.now() - silenceTime.current;
-        if (
-          isSilent.current === true &&
-          silenceTime !== null &&
-          timeDifference > frameInterval * minimumChunkSize
-        ) {
-          console.log('Time difference:', timeDifference, 'ms');
-          sendSilence();
-          silenceTime.current = performance.now();
-        }
-      }, 10);
-    }, []);
+        const audioDataChunk = audioDataQueue.current.shift();
+        // Send audio data chunk to lipsync server or silence if no audio data
+        sendAudioDataChunkToLipsync(audioDataChunk || new Uint8Array(1068));
+      }, 30);
+    }, [interrupted]);
+
+    // Function to interrupt the current processing audio
+    const interrupt = () => {
+      console.warn('Interrupted!');
+      interrupted.current = true;
+      audioDataQueue.current = [];
+      interrupted.current = false;
+    };
 
     const handlePCMPlayerOnstart = () => {
-      // Start recording silence time
-      silenceTime.current = performance.now();
-
       // Play video from queue
       playFrameQueue();
     };
@@ -109,11 +108,6 @@ const SimliFaceStream = forwardRef(
         onended() {
           handlePCMPlayerOnended();
         },
-        onsilent() {
-          if (isSilent.current === false) {
-            isSilent.current = true;
-          }
-        },
       });
       audioPCMPlayer.current.volume(1.0);
 
@@ -123,12 +117,20 @@ const SimliFaceStream = forwardRef(
         setVideoContext(videoCanvas?.getContext('2d'));
         console.log('VideoContext created');
       }
-    }, [start]);
+    }, [start, handlePCMPlayerOnended, handlePCMPlayerOnstart]);
 
-    const sendAudioDataToLipsync = (audioData: Uint8Array) => {
+    // Chunk the audio data and add to audio data queue
+    const sendAudioData = (audioData: Uint8Array) => {
+      for (let i = 0; i < audioData.length; i += 1068) {
+        const chunk = audioData.slice(i, i + 1068);
+        audioDataQueue.current.push(chunk);
+      }
+    };
+
+    // Send audio data chunk to lipsync server
+    const sendAudioDataChunkToLipsync = (audioDataChunk: Uint8Array) => {
       if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-        ws.current.send(audioData);
-        isSilent.current = false;
+        ws.current.send(audioDataChunk);
       }
     };
 
@@ -236,9 +238,7 @@ const SimliFaceStream = forwardRef(
       // Update current frame buffer if there is a new frame
       if (currentFrameIndex.current === 0) {
         const frame: ImageFrame[] | undefined = frameQueue.current.shift();
-        if (frame !== undefined) {
-          currentFrameQueue.current = frame;
-        }
+        currentFrameQueue.current = frame;
       }
 
       if (

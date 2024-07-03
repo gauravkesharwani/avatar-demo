@@ -33,7 +33,7 @@ import SimliFaceStream from "./SimliFaceStream/SimliFaceStream";
 import { StartAudioToVideoSession } from "./SimliFaceStream/startAudioToVideoSession";
 
 interface SimliFaceStreamRef {
-  sendAudioDataToLipsync: (pcm16Array: Uint8Array) => void;
+  sendAudioData: (pcm16Array: Uint8Array) => void;
 }
 
 /**
@@ -148,7 +148,7 @@ export default function Conversation(): JSX.Element {
       convertMp3ToPcm16(blob).then((pcm16Array) => {
         console.log("PCM16 Array:", pcm16Array);
         if (simliFaceStreamRef.current) {
-          simliFaceStreamRef.current.sendAudioDataToLipsync(pcm16Array);
+          simliFaceStreamRef.current.sendAudioData(pcm16Array);
         }
       });
 
