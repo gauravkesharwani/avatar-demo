@@ -30,7 +30,7 @@ export const Controls = ({
   const { formRef, onKeyDown } = useSubmit()
 
   useEffect(() => { 
-    startMicrophone();
+    // startMicrophone();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

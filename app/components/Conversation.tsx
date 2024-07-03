@@ -524,13 +524,17 @@ export default function Conversation(): JSX.Element {
             <div className="flex flex-col flex-auto h-full">
               <div className="flex flex-col justify-between h-full">
                 {!initialLoad && (
-                  <div className="w-full h-[256px] flex justify-center items-center scale-50 p-4">
-                    <SimliFaceStream
-                      ref={simliFaceStreamRef}
-                      start={true}
-                      sessionToken={sessionToken}
-                      minimumChunkSize={12}
-                    />
+                  <div className="w-full h-[256px] flex justify-center items-center">
+                    <div className=" relative h-[256px] w-[256px] rounded-full overflow-hidden">
+                      <div className="scale-50 absolute -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2" >
+                        <SimliFaceStream
+                          ref={simliFaceStreamRef}
+                          start={true}
+                          sessionToken={sessionToken}
+                          minimumChunkSize={12}
+                        />
+                      </div>
+                    </div>
                   </div>
                 )}
                 <div

@@ -11,9 +11,9 @@ export const LeftBubble = ({ message }: { message: Message }) => {
       <div className="col-start-1 col-end-13 sm:col-end-11 md:col-end-9 lg:col-end-8 xl:col-end-7 md:px-3 pt-3">
         <div className="flex items-start gap-2 flex-col md:flex-row">
           <div className="flex items-start gap-2 flex-col md:flex-row max-w-full md:max-w-none">
-            <div className="min-w-12 text-white shrink-0">
+            {/* <div className="min-w-12 text-white shrink-0">
               <AgentAvatar message={message} />
-            </div>
+            </div> */}
             <div className="glass flex p-4 rounded-e-xl rounded-es-xl max-w-full md:max-w-none">
               <div className="flex flex-col overflow-hidden pre-overflow-y-auto">
                 <MessageHeader message={message} />
