@@ -2,7 +2,11 @@
 
 Combine Text-to-Speech, Speech-to-Text and Simli's Speech-to-Video into a conversational agent.
 
-https://github.com/simliai/simli-deepgram-conversational-demo/assets/21877450/de752be0-954a-405b-b995-c8a5e3382d28
+
+
+https://github.com/simliai/simli-deepgram-conversational-demo/assets/22096869/adecd52e-3384-44b3-9aa4-dd94d62dce57
+
+
 
 ## Demo features
 
