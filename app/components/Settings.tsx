@@ -116,20 +116,10 @@ export const Settings = () => {
     <>
       <div className="flex items-center gap-2.5 text-sm">
         <span className="bg-gradient-to-r to-[#13EF93]/50 from-[#149AFB]/80 rounded-full flex">
-          <a
-            className={`relative m-px bg-black md:w-[9.25rem] w-10 h-10 rounded-full text-sm p-2.5 group md:hover:w-[9.25rem] transition-all ease-in-out duration-1000 overflow-hidden whitespace-nowrap`}
-            href="#"
-            onClick={onOpen}
-          >
-            <CogIcon className="w-5 h-5 transition-transform ease-in-out duration-2000 group-hover:rotate-180" />
-            <span className="ml-2.5 text-xs">Change settings</span>
-          </a>
+       
         </span>
         <span className="hidden md:inline-block text-white/50 font-inter">
-          Voice:{" "}
-          <span className="text-white">
-            {voiceMap(ttsOptions?.model as string).name}
-          </span>
+          
         </span>
       </div>
       <Modal
