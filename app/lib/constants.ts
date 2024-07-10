@@ -2,7 +2,7 @@ import { contextualHello } from "./helpers";
 
 export const systemContent = `
 
-# Deepgram AI Persona
+# Avatar Persona
 
 ## Base instructions
 
