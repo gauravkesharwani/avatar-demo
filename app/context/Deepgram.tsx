@@ -62,7 +62,7 @@ const voices: {
   };
 } = {
   [DEFAULT_TTS_MODEL]: {
-    name: "Olivia",
+    name: "Tony",
     avatar: "/aura-asteria-en.svg",
     language: "English",
     accent: "US",

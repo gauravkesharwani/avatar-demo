@@ -45,7 +45,7 @@ export default function Conversation(): JSX.Element {
    * Custom context providers
    */
   const simliFaceStreamRef = useRef<SimliFaceStreamRef | null>(null);
-  const [faceId, setFaceId] = useState("tmp9i8bbq7c");
+  const [faceId, setFaceId] = useState("5514e24d-6086-46a3-ace4-6a7264e5cb7c");
   const [sessionToken, setSessionToken] = useState("");
 
   const { ttsOptions, connection, connectionReady } = useDeepgram();
