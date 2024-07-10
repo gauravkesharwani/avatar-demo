@@ -30,18 +30,22 @@ export async function POST(req: NextRequest) {
       }
     );
 
-  return await fetch(
-    `${process.env.DEEPGRAM_STT_DOMAIN}/v1/speak?model=${model}`,
-    {
-      method: "POST",
-      body: JSON.stringify({ text }),
-      headers: {
-        "Content-Type": `application/json`,
-        Authorization: `token ${process.env.DEEPGRAM_API_KEY || ""}`,
-        "X-DG-Referrer": url,
-      },
-    }
-  )
+    return await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/kq68Uerrpzn6zZzARbDO/stream?optimize_streaming_latency=3`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "audio/mpeg",
+          "Content-Type": "application/json",
+          "xi-api-key": process.env.ELEVENLABS_API_KEY || "",
+        },
+        body: JSON.stringify({
+          text: text,
+          model_id: 'eleven_turbo_v2',
+       
+        }),
+      }
+    )
     .then(async (response) => {
       const headers = new Headers();
       headers.set("X-DG-Latency", `${Date.now() - start}`);
