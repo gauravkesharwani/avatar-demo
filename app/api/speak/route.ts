@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     );
 
     return await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/4KswfR6oxwetrxpwqu9r/stream?optimize_streaming_latency=3`,
+      `https://api.elevenlabs.io/v1/text-to-speech/${process.env.ELEVENLABS_VOICE_ID}/stream?optimize_streaming_latency=3`,
       {
         method: "POST",
         headers: {
